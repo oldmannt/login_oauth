@@ -2,13 +2,24 @@ import http from "http";
 import session from "express-session";
 import express from "express";
 import { google, plus_v1 } from "googleapis";
-import logger from "./util/logger";
-import { AxiosResponse } from "axios";
+import dotenv from "dotenv";
+import fs from "fs";
 
 const plus = google.plus("v1");
-const CLIENT_ID = "398761765507-1l4g8hbfl2suu87b4b2dpqigi2bf2bhp.apps.googleusercontent.com";
-const CLIENT_SECRET = "hbyI2qS57Y2uoNFqVftjO6wK";
-const REDIRECTION_URL = "http://localhost:9527/oauth_callback";
+
+// Load environment variables from .env file, where API keys and passwords are configured
+if (!fs.existsSync(".env")) {
+    console.error("Using .env file to supply config environment variables.");
+}
+else {
+    dotenv.config({ path: ".env" });
+    console.info("load .env");
+}
+
+
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
+const REDIRECTION_URL = process.env.REDIRECTION_URL;
 
 function getOAuthClient() {
     return new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECTION_URL);
