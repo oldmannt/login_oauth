@@ -4,16 +4,17 @@ import express from "express";
 import { google, plus_v1 } from "googleapis";
 import dotenv from "dotenv";
 import fs from "fs";
+import logger from "./utils/logger";
 
 const plus = google.plus("v1");
 
 // Load environment variables from .env file, where API keys and passwords are configured
 if (!fs.existsSync(".env")) {
-    console.error("Using .env file to supply config environment variables.");
+    logger.error("Using .env file to supply config environment variables.");
 }
 else {
     dotenv.config({ path: ".env" });
-    console.info("load .env");
+    logger.info("load .env");
 }
 
 
@@ -83,7 +84,7 @@ app.get("/", function(req, res) {
 });
 
 app.get("/details", function(req, res) {
-    console.log(`/details ${req.session}`);
+    logger.info(`/details ${req.session}`);
     if (!req.session) {
         res.status(403);
         return;
@@ -92,7 +93,7 @@ app.get("/details", function(req, res) {
     const oauth2Client = getOAuthClient();
     oauth2Client.setCredentials(req.session["tokens"]);
     plus.people.get({userId: "me", auth: oauth2Client }, function(err, response) {
-        console.log(`plus.people.get err: ${err} response: ${response}`);
+        logger.info(`plus.people.get err: ${err} response: ${response}`);
         if (response) {
             res.send(`
             <img src=${response.data.image.url} />
@@ -112,5 +113,5 @@ const port = 9527;
 const server = http.createServer(app);
 server.listen(port);
 server.on("listening", function() {
-    console.log("listening to ${port}");
+    logger.info(`listening to ${port}`);
 });
